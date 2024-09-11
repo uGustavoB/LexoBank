@@ -1,138 +1,84 @@
 class ListaError(Exception):
     def __init__(self, msg):
         super().__init__(msg)
- 
+
 class No:
     def __init__(self, carga):
+        '''
+        Construtor que inicializa um nó com uma carga e nenhum próximo nó.
+        '''
         self.carga = carga
         self.proximo = None
-    
+
     def __str__(self) -> str:
         return f"{self.carga}"
-    
+
 class Lista:
     def __init__(self):
-        self.__head = None
-        self.__tamanho = 0
+        '''
+        Construtor que inicializa uma lista vazia.
+        '''
+        self.cabeca = None
 
-    def __len__(self):
-        return self.__tamanho
-    
-    def tamanho(self):
-        return len(self)
-    
-    def estaVazia(self):
-        return self.__head is None
-    
-    def elemento(self, posicao):
-        if not (0 < posicao <= len(self)):
-            raise ListaError(f"Posição inválida. Lista contém {self.__tamanho} elementos")
+    def esta_vazia(self) -> bool:
+        '''
+        Verifica se a lista está vazia.
+        '''
+        return self.cabeca is None
+
+    def inserir(self, carga) -> None:
+        '''
+        Insere um elemento no início da lista.
+        '''
+        novo_no = No(carga)
+        novo_no.proximo = self.cabeca
+        self.cabeca = novo_no
+
+    def remover(self, carga) -> None:
+        '''
+        Remove um elemento da lista.
+        '''
+        if self.esta_vazia():
+            raise ListaError("A lista está vazia")
         
-        cursor = self.__head
-        for _ in range(posicao - 1):
-            cursor = cursor.proximo
-        return cursor.carga
-    
-    def busca(self, chave):
-        cursor = self.__head
-        contador = 1
-        while cursor is not None:
-            if chave == cursor.carga:
-                return contador
-            cursor = cursor.proximo
-            contador += 1
-        raise ListaError("Chave não encontrada na lista.")
-    
-    def modificar(self, posicao, carga):
-        if not (0 < posicao <= len(self)):
-            raise ListaError(f"Posição inválida. Lista contém {self.__tamanho} elementos")
-        
-        cursor = self.__head
-        contador = 1
-        while cursor is not None:
-            if contador == posicao:
-                cursor.carga = carga
+        atual = self.cabeca
+        anterior = None
+        while atual is not None:
+            if atual.carga == carga:
+                if anterior is None:
+                    self.cabeca = atual.proximo
+                else:
+                    anterior.proximo = atual.proximo
                 return
-            cursor = cursor.proximo
-            contador += 1
+            anterior = atual
+            atual = atual.proximo
+        raise ListaError(f"Elemento {carga} não encontrado")
 
-    # IMPLEMENTAÇÃO FUTURA - MOSTRAR DE FORMA ORGANIZADA O HISTORICO DE CADA CONTA CRIADA
-    # VAI SER NECESSÁRIO CORRIGIR O SERVIDOR E CLIENTE, ENTÃO VAMOS MEDIR SE VALE A PENA FAZER ISSO KKK
-    def adicionar_transacao(self, transacao): # INICIO
-        self.inserir(len(self) + 1, transacao)
-    
-    def filtrar_por_conta(self, conta):
-        cursor = self.__head
-        resultado = []
-        while cursor is not None:
-            if f"conta {conta}" in cursor.carga:
-                resultado.append(cursor.carga)
-            cursor = cursor.proximo
-        return resultado # FIM
-    
-    def inserir(self, posicao:int, carga:any):
-        if not (0 < posicao <= len(self) + 1):
-            raise ListaError(f"Posição inválida. Lista contém {self.__tamanho} elementos")
+    def __iter__(self):
+        '''
+        Permite iteração sobre a lista.
+        '''
+        atual = self.cabeca
+        while atual is not None:
+            yield atual.carga
+            atual = atual.proximo
 
-        if self.estaVazia():
-            if posicao != 1:
-                raise ListaError(f"A lista está vazia. A posição correta para inserção é 1.")
-            self.__head = No(carga)
-            self.__tamanho += 1
-            return
-        
-        if posicao == 1:
-            no = No(carga)
-            no.proximo = self.__head
-            self.__head = no
-            self.__tamanho += 1
-            return
-        
-        cursor = self.__head
-        contador = 1
-        while contador < posicao - 1:
-            cursor = cursor.proximo
-            contador += 1
-        
-        no = No(carga)
-        no.proximo = cursor.proximo
-        cursor.proximo = no
-        self.__tamanho += 1
-
-    def esvazia(self):
-        while not self.estaVazia():
-            self.remover(1)
-    
-    def remover(self, posicao):
-        if not (0 < posicao <= len(self) + 1):
-            raise ListaError(f"Posição inválida. Lista contém {self.__tamanho} elementos")
-
-        if posicao == 1:
-            carga = self.__head.carga
-            self.__head = self.__head.proximo
-            self.__tamanho -= 1
-            return carga
-        
-        cursor = self.__head
-        contador = 1
-        while contador < posicao - 1:
-            cursor = cursor.proximo
-            contador += 1
-        
-        carga = cursor.proximo.carga
-        cursor.proximo = cursor.proximo.proximo
-        self.__tamanho -= 1
-        return carga
-        
     def __str__(self) -> str:
-        mostrarLista = "Lista -> [ "
+        '''
+        Retorna uma string que representa a lista.
+        '''
+        if self.esta_vazia():
+            return "Lista vazia"
+        return " -> ".join(str(item) for item in self)
 
-        cursor = self.__head
-        while cursor is not None:
-            mostrarLista += f"{cursor.carga}, "
-            cursor = cursor.proximo
-        
-        mostrarLista = mostrarLista.strip(", ")
-        mostrarLista += " ]"
+    def __len__(self) -> int:
+        '''
+        Retorna o número de elementos na lista.
+        '''
+        return sum(1 for _ in self)
 
-        return mostrarLista
+    def buscar(self, carga) -> bool:
+        '''
+        Verifica se um elemento está na lista.
+        '''
+        return carga in self
