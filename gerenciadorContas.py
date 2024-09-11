@@ -35,7 +35,10 @@ class Conta:
         
         self.sacar(valor)
         conta_destino.depositar(valor)
-        self.historico.inserir(f"Transferência para conta {conta_destino.numero}: {valor}")  
+        self.historico.inserir(f"Transferência para conta {conta_destino.numero}: {valor}")
+    
+    def exibeHistorico(self) -> str:
+        return self.historico.imprimir()
 
     def __str__(self):
         return f'Conta {self.numero}: Saldo {self.saldo}'
@@ -55,6 +58,7 @@ class GerenciadorContas:
             return "Conta já existe"
         conta = Conta(numero, saldo)
         self.__contas.insert(conta)  # Insere o objeto Conta na árvore AVL
+        conta.historico.inserir(f"Déposito inicial de: {saldo}.")
         return "Conta criada com sucesso"
 
     def consultar_saldo(self, numero):
@@ -112,5 +116,5 @@ class GerenciadorContas:
         '''
         conta = self.__contas.search(numero)
         if conta:
-            return conta.historico()  # Supondo que a Conta tenha um método histórico
+            return conta.exibeHistorico()  # Supondo que a Conta tenha um método histórico
         return "Conta não encontrada."

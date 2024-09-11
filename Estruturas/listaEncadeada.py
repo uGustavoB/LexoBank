@@ -53,6 +53,14 @@ class Lista:
             anterior = atual
             atual = atual.proximo
         raise ListaError(f"Elemento {carga} não encontrado")
+    
+    def imprimir(self) -> str:
+        '''
+        Retorna uma string que representa a lista.
+        '''
+        if self.esta_vazia():
+            return "Lista vazia"
+        return " -> ".join(str(item) for item in self)
 
     def __iter__(self):
         '''
