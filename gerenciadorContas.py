@@ -14,6 +14,8 @@ class Conta:
         '''
         Deposita um valor na conta e adiciona a transação ao histórico.
         '''
+        if valor <= 0:
+            raise ValueError("O valor do depósito deve ser positivo")
         self.saldo += valor
         self.historico.inserir(f"Depósito: {valor}")
 
@@ -23,6 +25,8 @@ class Conta:
         '''
         if valor > self.saldo:
             raise ValueError("Saldo insuficiente")
+        if valor <= 0:
+            raise ValueError("O valor do saque deve ser positivo")
         self.saldo -= valor
         self.historico.inserir(f"Saque: {valor}")
 
@@ -32,10 +36,18 @@ class Conta:
         '''
         if not isinstance(conta_destino, Conta):
             raise TypeError("O destino deve ser uma instância de Conta")
+        if valor > self.saldo:
+            raise ValueError("Saldo insuficiente")
+        if conta_destino == self:
+            raise ValueError("Não é possível transferir para a mesma conta")
+        if valor <= 0:
+            raise ValueError("O valor da transferência deve ser positivo")
         
-        self.sacar(valor)
-        conta_destino.depositar(valor)
+        self.saldo -= valor
         self.historico.inserir(f"Transferência para conta {conta_destino.numero}: {valor}")
+        
+        conta_destino.saldo += valor
+        conta_destino.historico.inserir(f"Transferência da conta {self.numero}: {valor}")
     
     def exibeHistorico(self) -> str:
         return self.historico.imprimir()
@@ -56,6 +68,9 @@ class GerenciadorContas:
         '''
         if self.__contas.search(numero):
             return "Conta já existe"
+        if saldo <= 0:
+            return "Saldo inicial deve ser positivo"
+        
         conta = Conta(numero, saldo)
         self.__contas.insert(conta)  # Insere o objeto Conta na árvore AVL
         conta.historico.inserir(f"Déposito inicial de: {saldo}.")
@@ -116,5 +131,5 @@ class GerenciadorContas:
         '''
         conta = self.__contas.search(numero)
         if conta:
-            return conta.exibeHistorico()  # Supondo que a Conta tenha um método histórico
+            return conta.exibeHistorico()
         return "Conta não encontrada."
