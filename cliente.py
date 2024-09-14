@@ -30,6 +30,7 @@ if __name__ == "__main__":
                 if escolha == "1":
                     numero_conta = input("Número da conta: ")
                     saldo = input("Saldo inicial: ")
+                    
                     cliente.enviar_requisicao(f"CREATE {numero_conta} {saldo}") # Envia uma requisão ao servidor para criar uma nova conta
                     cliente.pausa_interacao()
 

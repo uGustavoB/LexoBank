@@ -1,4 +1,5 @@
 import socket
+import threading
 from gerenciadorContas import GerenciadorContas
 from protocolo import processar_requisicao
  
@@ -10,7 +11,7 @@ class ServidorBanco:
         self.__servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Cria um objeto socket
         self.__servidor.bind((host, port)) # Associa o socket ao endereço IP e porta fornecidos
         self.__servidor.listen(5)  # Configura para que o servidor escute até 5 conexões. Se for aumentar tem que verificar se pode afetar no desempenho
-        self.__gerenciador = GerenciadorContas()  # Usa a AVL e a Lista Encadeada
+        self.__gerenciador = GerenciadorContas()  # Usa a AVL e a Pilha Encadeada
 
     def iniciar_servidor(self):
         '''
@@ -25,12 +26,16 @@ class ServidorBanco:
                 print(f"Conexão estabelecida com {self.endereco}")
 
                 # Aqui vai gerenciar a comunicação com o cliente conectado
-                self.__gerenciar_cliente(cliente)
+                cliente_thread = threading.Thread(target=self.__gerenciar_cliente, args=(cliente, self.endereco))
+                cliente_thread.start()
             except socket.error as e:
                 # Captura e exibe erros relacionados à opreção do servidor
                 print(f"Erro no servidor: {e}")
+            except KeyboardInterrupt:
+                print("\nServidor encerrado.")
+                break
 
-    def __gerenciar_cliente(self, cliente):
+    def __gerenciar_cliente(self, cliente, endereco):
         '''
         Gerencia a comunicação com um cliente específico.
         '''
