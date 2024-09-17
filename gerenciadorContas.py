@@ -8,54 +8,50 @@ class GerenciadorContas:
         '''
         self.__contas = AVLTree()
 
-    def criar_conta(self, numero, saldo):
+    def criar_conta(self, numero:int, saldo:float) -> bool:
         '''
         Cria uma nova conta e adiciona à árvore de contas
         '''
         if self.__contas.search(numero):
-            return "Conta já existe"
+            raise ValueError("Conta já existe")
         if saldo < 0:
-            return "Saldo inicial não pode ser negativo"
+            raise ValueError("Saldo inicial não pode ser negativo")
         
         conta = Conta(numero, saldo)
         self.__contas.insert(conta)  # Insere o objeto Conta na árvore AVL
-        conta.historico.inserir(f"Déposito inicial de: {saldo}.")
-        return "Conta criada com sucesso"
+        conta.historico.empilha(f"Déposito inicial de: {saldo}.")
+        return True
 
-    def consultar_saldo(self, numero):
+    def consultar_saldo(self, numero:int) -> float:
         '''
         Consulta o saldo de uma conta
         '''
         conta = self.__contas.search(numero)
         if conta:
-            return f"Saldo da conta {conta.numero}: {conta.saldo}"
-        else:
-            return "Conta não encontrada."
+            return conta.saldo
+        raise ValueError("Conta não encontrada")
 
-    def depositar(self, numero, valor):
+    def depositar(self, numero:int, valor:float) -> bool:
         '''
         Deposita um valor na conta informada
         '''
         conta = self.__contas.search(numero)
         if isinstance(conta, Conta):
             conta.depositar(valor)
-            return "Depósito realizado com sucesso"
-        return "Conta não encontrada"
-
-    def sacar(self, numero, valor):
+            return True
+        raise ValueError("Conta não encontrada")
+    
+    def sacar(self, numero:int, valor:float) -> bool:
         '''
         Saca um valor da conta especificada
         '''
         conta = self.__contas.search(numero)
         if isinstance(conta, Conta):
-            try:
-                conta.sacar(valor)
-                return "Saque realizado com sucesso."
-            except ValueError as e:
-                return str(e)
-        return "Conta não encontrada"
+            conta.sacar(valor)
+            return True
+        raise ValueError("Conta não encontrada")
 
-    def transferir(self, numero_origem: str, numero_destino: str, valor: float):
+    def transferir(self, numero_origem: str, numero_destino: str, valor: float) -> bool:
         '''
         Transfere um valor de uma conta para outra
         '''
@@ -63,19 +59,15 @@ class GerenciadorContas:
         conta_destino = self.__contas.search(numero_destino)
         
         if conta_origem and conta_destino:
-            try:
-                conta_origem.transferir(valor, conta_destino)
-                return f"Transferência de {valor} realizada da conta {numero_origem} para a conta {numero_destino}."
-            except (ValueError, TypeError) as e:
-                return str(e)
-        else:
-            return "Uma ou ambas as contas não foram encontradas."
+            conta_origem.transferir(valor, conta_destino)
+            return True
+        raise ValueError("Conta não encontrada")
 
-    def historico(self, numero):
+    def historico(self, numero:int) -> str:
         '''
         Retorna o histórico de transações de uma conta
         '''
         conta = self.__contas.search(numero)
         if conta:
             return conta.exibeHistorico()
-        return "Conta não encontrada."
+        raise ValueError("Conta não encontrada")

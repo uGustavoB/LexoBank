@@ -23,9 +23,9 @@ class Conta:
         Saca um valor da conta e adiciona a transação ao histórico.
         '''
         if valor > self.saldo:
-            raise ValueError("Saldo insuficiente")
+            raise ValueError("Saldo insuficiente.")
         if valor <= 0:
-            raise ValueError("O valor do saque deve ser positivo")
+            raise ValueError("O valor do saque deve ser maior que zero.")
         self.saldo -= valor
         self.historico.empilha(f"Saque: {valor}")
 
@@ -49,7 +49,7 @@ class Conta:
         conta_destino.historico.empilha(f"Transferência da conta {self.numero}: {valor}")
     
     def exibeHistorico(self) -> str:
-        return self.historico.imprimir()
+        return self.historico
 
     def __str__(self):
         return f'Conta {self.numero}: Saldo {self.saldo}'

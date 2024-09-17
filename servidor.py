@@ -33,7 +33,7 @@ class ServidorBanco:
                 print(f"Erro no servidor: {e}")
             except KeyboardInterrupt:
                 print("\nServidor encerrado.")
-                break
+                break    
 
     def __gerenciar_cliente(self, cliente, endereco):
         '''
@@ -50,9 +50,8 @@ class ServidorBanco:
 
                 # Processa a requisição recebida e obtém a resposta
                 resposta = processar_requisicao(requisicao, self.__gerenciador)
-
                 # Envia a resposta de volta para o cliente
-                cliente.send(resposta.encode())
+                cliente.send(str(resposta).encode())
         except socket.error as e:
             # Captura e exibe erros relacionados à comunicação com o cliente
             print(f"Erro na comunicação com o cliente: {e}")
