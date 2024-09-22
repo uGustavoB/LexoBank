@@ -225,7 +225,7 @@ class Pilha:
             da base para o topo da pilha.   
         """
         cursor = self.__head
-        s = 'topo->['
+        s = 'Histórico -> ['
         while( cursor != None):
             s += f'{cursor.carga}, '
             cursor = cursor.prox

@@ -51,7 +51,7 @@ class ServidorBanco:
                 # Processa a requisição recebida e obtém a resposta
                 resposta = processar_requisicao(requisicao, self.__gerenciador)
                 # Envia a resposta de volta para o cliente
-                cliente.send(str(resposta).encode())
+                cliente.send(f"{resposta[0]},{resposta[1] if resposta[1] is not None else ''}".encode())
         except socket.error as e:
             # Captura e exibe erros relacionados à comunicação com o cliente
             print(f"Erro na comunicação com o cliente: {e}")
