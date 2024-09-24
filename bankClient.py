@@ -72,8 +72,10 @@ class BankClient:
         }
         
         # Gustavo - Adicionado verificação para retornar a mensagem de erro personalizada
-        if codigo == 404 or codigo == 200:
+        if codigo == 404:
             return mensagem if mensagem else None
+        if codigo == 200:
+            return mensagem if mensagem else mensagens.get(codigo, None)
         return mensagens.get(codigo, mensagem if mensagem else None)
 
     def pausa_interacao(self):
