@@ -2,19 +2,27 @@ from bankClient import BankClient
 import os
 
 if __name__ == "__main__":
-    # Cria uma instância do cliente do banco
+    '''
+    Ponto de entrada do programa, que inicia a interação com o cliente do banco. 
+
+    Este bloco cria uma instância da classe `BankClient` e permite que o usuário interaja com um menu de opções
+    para realizar operações bancárias como criar conta, consultar saldo, depositar, sacar, transferir e visualizar 
+    o histórico de transações.
+    
+    Exemplo de uso:
+        Executar o script para iniciar a interação do cliente.
+    '''
     cliente = BankClient()
 
     # Verificia se a conexão com o servidor foi estabelecida
-    if cliente.cliente:
+    if cliente.cliente: # O atributo cliente da instância BankClient indica o status da conexão.
         while True:
-            # Limpa o terminal a cada interação para uma melhor visualização
-            if os.name == 'nt': # Para Windows
+            # Limpa o terminal a cada interação para uma melhor visualização para Windows e para sistemas baseado em Unix (Linux, macOS)
+            if os.name == 'nt': 
                 os.system('cls')
-            else: # Para sistemas baseado em Unix (Linux, macOS)
+            else: 
                 os.system('clear')
 
-            # Exibe o menu de opções se a conexão foi estabelecida
             print("1. Criar Conta")
             print("2. Consultar Saldo")
             print("3. Depositar")
@@ -30,42 +38,40 @@ if __name__ == "__main__":
                 if escolha == "1":
                     numero_conta = input("Número da conta: ")
                     saldo = input("Saldo inicial: ")
-                    
-                    cliente.enviar_requisicao(f"CREATE {numero_conta} {saldo}") # Envia uma requisão ao servidor para criar uma nova conta
+                    cliente.enviar_requisicao(f"CREATE {numero_conta} {saldo}")
                     cliente.pausa_interacao()
 
                 elif escolha == "2":
                     numero_conta = input("Número da conta: ") 
-                    cliente.enviar_requisicao(f"BALANCE {numero_conta}") # Envia uma requisição ao servidor para consultar o saldo da conta fornecida
-                    cliente.pausa_interacao() # Pausa a interação para que o usuário possa ver a resposta antes de continuar
+                    cliente.enviar_requisicao(f"BALANCE {numero_conta}") 
+                    cliente.pausa_interacao() 
                     # Pode ser substituído por input("Pressione Enter para continuar...")
 
                 elif escolha == "3":
                     numero_conta = input("Número da conta: ")
                     valor = input("Valor do depósito: ")
-                    cliente.enviar_requisicao(f"DEPOSIT {numero_conta} {valor}") # Envia uma requisição ao servidor para depositar o valor na conta fornecida
+                    cliente.enviar_requisicao(f"DEPOSIT {numero_conta} {valor}") 
                     cliente.pausa_interacao()
 
                 elif escolha == "4":
                     numero_conta = input("Número da conta: ")
                     valor = input("Valor do saque: ")
-                    cliente.enviar_requisicao(f"WITHDRAW {numero_conta} {valor}") # Envia uma requisição ao servidor para sacar o valor da conta fornecida
+                    cliente.enviar_requisicao(f"WITHDRAW {numero_conta} {valor}") 
                     cliente.pausa_interacao()
 
                 elif escolha == "5":
                     conta_origem = input("Número da conta de origem: ")
                     conta_destino = input("Número da conta de destino: ")
                     valor = input("Valor da transferência: ")
-                    cliente.enviar_requisicao(f"TRANSFER {conta_origem} {conta_destino} {valor}") # Envia uma requisição ao servidor para transferir o valor da conta de origem para a conta de destino
+                    cliente.enviar_requisicao(f"TRANSFER {conta_origem} {conta_destino} {valor}") 
                     cliente.pausa_interacao()
 
                 elif escolha == "6":
                     numero_conta = input("Número da conta: ")
-                    cliente.enviar_requisicao(f"HISTORY {numero_conta}") # Envia uma requisição ao servidor para obter o histórico de transações da conta fornecida
+                    cliente.enviar_requisicao(f"HISTORY {numero_conta}") 
                     cliente.pausa_interacao()
 
                 elif escolha == "7":
-                    # Fecha a conexão e encerra o loop
                     cliente.fechar_conexao()
                     break
 
@@ -73,7 +79,6 @@ if __name__ == "__main__":
                     print("Opção inválida.")
                     cliente.pausa_interacao()
 
-            except Exception as e:
-                # Captura e exibe erros inesperado
-                print(f"Erro: {e}")
+            except Exception:
+                print(f"Erro de entrada: Lembre-se de que você deve inserir números válidos. Revise seus dados e tente novamente.")
                 cliente.pausa_interacao()

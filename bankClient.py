@@ -2,13 +2,29 @@ import socket
 
 class BankClient:
     '''
-    Classe para gerenciar a conexão com um servidor de banco usando sockets
+    Classe para gerenciar a comunicação com um servidor de banco usando sockets.
+
+    Essa classe permite que o cliente se conecte a um servidor, envie solicitações e receba respostas,
+    além de interpretar os códigos de resposta do servidor e fechar a conexão de forma segura.
+
+    Atributos:
+        cliente (socket.socket): Objeto socket que representa a conexão com o servidor. É inicializado
+        no método `__init__` e utilizado nos métodos `enviar_requisicao` e `fechar_conexao`.
     '''
     def __init__(self, host="localhost", port=9999):
         '''
-        Inicializa a conexão com o servidor
+        Inicializa a conexão com o servidor de banco.
 
-        Se a conexão falhar, a conexão é definida como None
+        O método tenta estabelecer uma conexão TCP/IP com o servidor usando o endereço e porta fornecidos.
+        Em caso de erro na conexão, a conexão é marcada como `None` para evitar problemas nos outros métodos
+        que dependem da existência da conexão.
+
+        Parâmetros:
+            host (str): Endereço do servidor. O padrão é "localhost".
+            port (int): Porta na qual o servidor está escutando. O padrão é 9999.
+
+        Exceções:
+            socket.error: Captura erros de conexão e informa que a conexão falhou.
         '''
         try:
             self.cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Cria um socket TCP/IP
@@ -21,9 +37,20 @@ class BankClient:
 
     def enviar_requisicao(self, requisicao):
         '''
-        Envia uma requisão para o servidor e imprime a resposta
+        Envia uma requisição para o servidor e lida com a resposta.
 
-        Levanta uma exceção se ocorrer um erro ao enviar a requisição 
+        O método envia uma requisição codificada ao servidor. Em seguida, espera uma resposta e processa o código 
+        de status retornado junto com a mensagem. Se o código de status for reconhecido, uma mensagem apropriada 
+        é exibida. Caso contrário, é apresentada a mensagem original recebida.
+
+        Parâmetros:
+            requisicao (str): A string que representa a solicitação a ser enviada para o servidor.
+
+        Exceções:
+            socket.error: Caso ocorra um erro ao enviar ou receber a requisição, será informado ao usuário.
+
+        Exemplo:
+            cliente.enviar_requisicao("CREATE 12345 1000.0")
         '''
         if self.cliente:
             try:
@@ -40,21 +67,28 @@ class BankClient:
                 else:
                     print(mensagem)
             except socket.error:
-                print(f"Erro ao enviar a requisição: verifique se o servidor está ativo.")
+                print(f"Erro ao enviar a requisição. Verifique se o servidor está ativo.")
         else:
-            print("Não há conexão com o servidor: verifique se o servidor está ativo.")
+            print("Não há conexão com o servidor. Verifique se o servidor está ativo.")
 
-    def fechar_conexao(self):
+    def obter_mensagem(self, codigo: int, mensagem: str = None):
         '''
-        Fecha a conexão com o servidor, se estiver aberta
-        '''
-        if self.cliente:
-            self.cliente.close() # Fecha a conexão 
-            print("Conexão encerrada.")
-        else:
-            print("Nenhuma conexão para fechar.")
+        Retorna uma mensagem correspondente ao código de status recebido do servidor.
 
-    def obter_mensagem(self, codigo:int, mensagem:str=None):
+        Esse método mapeia códigos de status recebidos do servidor para mensagens amigáveis ao usuário.
+        Para códigos de status conhecidos, retorna uma mensagem pré-definida. Para o código 404, retorna
+        a mensagem personalizada fornecida pelo servidor, se disponível.
+
+        Parâmetros:
+            codigo (int): O código de status retornado pelo servidor.
+            mensagem (str): Mensagem opcional personalizada retornada pelo servidor.
+
+        Retorna:
+            str: Mensagem amigável ao usuário baseada no código de status, ou `None` se o código for desconhecido.
+
+        Exemplo:
+            client.obter_mensagem(200)  # Retorna "Operação realizada com sucesso"
+        '''
         mensagens = {
             200: "Operação realizada com sucesso",
             201: "Conta criada com sucesso",
@@ -67,19 +101,41 @@ class BankClient:
             306: "O valor do depósito deve ser positivo",
             307: "O valor do saque deve ser maior que zero",
             308: "O valor da transferência deve ser positivo",
-            # Gustavo - Adicionado mensagem de erro genérica
+            # Adicionado mensagem de erro genérica
             404: "Erro desconhecido."
         }
         
-        # Gustavo - Adicionado verificação para retornar a mensagem de erro personalizada
+        # Adicionado verificação para retornar a mensagem de erro personalizada
         if codigo == 404:
             return mensagem if mensagem else None
         if codigo == 200:
             return mensagem if mensagem else mensagens.get(codigo, None)
         return mensagens.get(codigo, mensagem if mensagem else None)
+    
+    def fechar_conexao(self):
+        '''
+        Fecha a conexão com o servidor, caso esteja aberta.
+
+        Se o cliente tiver uma conexão aberta com o servidor, ela será fechada com segurança. Caso contrário,
+        uma mensagem informando que não há conexão será exibida.
+
+        Exemplo:
+            client.fechar_conexao()
+        '''
+        if self.cliente:
+            self.cliente.close()
+            print("Conexão encerrada.")
+        else:
+            print("Nenhuma conexão para fechar.")
 
     def pausa_interacao(self):
         """
-        Pausa a execução até que o usuário pressione Enter.
+        Pausa a execução do programa até que o usuário pressione Enter.
+
+        Esse método é útil para manter o programa em execução até que o usuário esteja pronto para continuar,
+        permitindo que o usuário visualize as informações antes que o programa prossiga.
+
+        Exemplo:
+            cliente.pausa_interacao()
         """
         input("\nPressione Enter para continuar...")
