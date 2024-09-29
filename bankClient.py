@@ -11,7 +11,7 @@ class BankClient:
         cliente (socket.socket): Objeto socket que representa a conexão com o servidor. É inicializado
         no método `__init__` e utilizado nos métodos `enviar_requisicao` e `fechar_conexao`.
     '''
-    def __init__(self, host="localhost", port=9999):
+    def __init__(self, host="localhost", port=9999, tamanhoBuffer=1024):
         '''
         Inicializa a conexão com o servidor de banco.
 
@@ -26,6 +26,8 @@ class BankClient:
         Exceções:
             socket.error: Captura erros de conexão e informa que a conexão falhou.
         '''
+
+        self.__tamanhoBuffer = tamanhoBuffer
         try:
             self.cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Cria um socket TCP/IP
             self.cliente.connect((host, port)) # Conecta ao servidor
@@ -55,7 +57,7 @@ class BankClient:
         if self.cliente:
             try:
                 self.cliente.send(requisicao.encode()) # Envia a requisição codificada
-                response = self.cliente.recv(4096).decode() # Recebe a resposta do servidor
+                response = self.cliente.recv(self.__tamanhoBuffer).decode() # Recebe a resposta do servidor
 
                 partes = response.split(",", 1)
                 codigo = int(partes[0].strip())
