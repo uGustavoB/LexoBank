@@ -33,14 +33,14 @@ class GerenciadorContas:
             print(resultado) # (201, None)
         '''
         if self.__contas.search(numero):
-            return 301, None
+            return 301
         if saldo < 0:
-            return 305, None
+            return 305
         
         conta = Conta(numero, saldo)
         self.__contas.insert(conta)  # Insere o objeto Conta na árvore AVL
         conta.historico.empilha(f"Déposito inicial de: {saldo}.")
-        return 201, None
+        return 201
 
     def consultar_saldo(self, numero:int) -> float:
         '''
@@ -59,10 +59,11 @@ class GerenciadorContas:
             saldo = gerenciador.consultar_saldo(12345)
             print(saldo) # (200, "Saldo: 1000.0")
         '''
+        # Gustavo - Retornar o saldo da conta na tupla
         conta = self.__contas.search(numero)
         if conta:
-            return (200, f"Saldo: {conta.saldo}")
-        return 300, None
+            return (200, conta.saldo)
+        return 300
 
     def depositar(self, numero:int, valor:float) -> bool:
         '''
@@ -85,7 +86,7 @@ class GerenciadorContas:
         conta = self.__contas.search(numero)
         if isinstance(conta, Conta):
             return conta.depositar(valor) 
-        return 300, None 
+        return 300
     
     def sacar(self, numero:int, valor:float) -> bool:
         '''
@@ -108,7 +109,7 @@ class GerenciadorContas:
         conta = self.__contas.search(numero)
         if isinstance(conta, Conta):
             return conta.sacar(valor) 
-        return 300, None 
+        return 300
 
     def transferir(self, numero_origem: str, numero_destino: str, valor: float) -> bool:
         '''
@@ -130,15 +131,15 @@ class GerenciadorContas:
 
         if conta_origem and conta_destino:
             if conta_origem.numero == conta_destino.numero:
-                return 303, None 
+                return 303
 
             resultado_saque = conta_origem.sacar(valor)
-            if resultado_saque[0] == 200: 
+            if resultado_saque == 200: 
                 conta_destino.depositar(valor)
-                return 200, None 
+                return 200
 
             return resultado_saque
-        return 300, None
+        return 300
 
     def historico(self, numero:int) -> str:
         '''
@@ -160,4 +161,4 @@ class GerenciadorContas:
         conta = self.__contas.search(numero)
         if conta:
             return (200, conta.exibeHistorico())
-        return 300, None
+        return 300

@@ -40,10 +40,10 @@ class Conta:
             print(resultado) # (200, None)
         '''
         if valor <= 0:
-            return 306, None
+            return 306
         self.saldo += valor
         self.historico.empilha(f"Depósito: {valor}")
-        return 200, None
+        return 200
 
     def sacar(self, valor: float):
         '''
@@ -65,12 +65,12 @@ class Conta:
             print(resultado)  # (200, None)
         '''
         if valor > self.saldo:
-            return 304, None
+            return 304
         if valor <= 0:
-            return 307, None
+            return 307
         self.saldo -= valor
         self.historico.empilha(f"Saque: {valor}")
-        return 200, None 
+        return 200
     
     def exibeHistorico(self) -> str:
         '''
@@ -85,7 +85,7 @@ class Conta:
             historico = conta.exibeHistorico()
             print(historico)  # Histórico -> [Depósito: 500.0, Déposito inicial de: 0.0.]
         '''
-        return self.historico
+        return self.historico.__str__()
 
     def __str__(self):
         '''

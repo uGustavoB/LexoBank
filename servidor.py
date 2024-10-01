@@ -15,7 +15,7 @@ class ServidorBanco:
         __gerenciador (GerenciadorContas): Instância da classe GerenciadorContas,
             responsável pela gestão das contas bancárias utilizando Estrutura de Dados AVL.
     """
-    def __init__(self, host="localhost", port=9999):
+    def __init__(self, host="0.0.0.0", port=9998, tamanhoBuffer = 1024):
         '''
         Inicializa o servidor com o endereço IP e a porta.
 
@@ -34,6 +34,7 @@ class ServidorBanco:
         self.__servidor.bind((host, port)) # Associa o socket ao endereço IP e porta fornecidos
         self.__servidor.listen(5)  # Configura para que o servidor escute até 5 conexões. Se for aumentar tem que verificar se pode afetar no desempenho
         self.__gerenciador = GerenciadorContas()
+        self.__tamanhoBuffer = tamanhoBuffer
 
     def iniciar_servidor(self):
         '''
@@ -80,13 +81,17 @@ class ServidorBanco:
         '''
         try:
             while True:
-                requisicao = cliente.recv(4096).decode() # Recebe a requisição do cliente. O tamanho do buffer é de 4096 bytes
+                requisicao = cliente.recv(self.__tamanhoBuffer).decode() # Recebe a requisição do cliente. O tamanho do buffer é de 4096 bytes
 
                 if not requisicao:
                     break
 
                 resposta = processar_requisicao(requisicao, self.__gerenciador) # Procesa a requisição recebida e obtém a resposta
-                cliente.send(f"{resposta[0]},{resposta[1] if resposta[1] is not None else ''}".encode()) # Envia a resposta de volta para o cliente
+                # Envia a resposta de volta para o cliente
+                if resposta is not tuple:
+                    cliente.send(f"{resposta}".encode())
+                else:
+                    cliente.send(f"{resposta[0]},{resposta[1]}".encode())
         except socket.error:
             print(f"Erro na comunicação com o cliente. Conexão encerrada.")
         finally:

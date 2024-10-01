@@ -1,4 +1,5 @@
 import socket
+import ast
 
 class BankClient:
     '''
@@ -11,7 +12,7 @@ class BankClient:
         cliente (socket.socket): Objeto socket que representa a conexão com o servidor. É inicializado
         no método `__init__` e utilizado nos métodos `enviar_requisicao` e `fechar_conexao`.
     '''
-    def __init__(self, host="localhost", port=9999, tamanhoBuffer=1024):
+    def __init__(self, host="localhost", port=9998, tamanhoBuffer=1024):
         '''
         Inicializa a conexão com o servidor de banco.
 
@@ -30,6 +31,7 @@ class BankClient:
         self.__tamanhoBuffer = tamanhoBuffer
         try:
             self.cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Cria um socket TCP/IP
+            self.cliente.settimeout(5) # Define um tempo limite de 5 segundos para a conexão
             self.cliente.connect((host, port)) # Conecta ao servidor
             print("Conectado ao servidor com sucesso.")
         except socket.error:
@@ -57,11 +59,17 @@ class BankClient:
         if self.cliente:
             try:
                 self.cliente.send(requisicao.encode()) # Envia a requisição codificada
-                response = self.cliente.recv(self.__tamanhoBuffer).decode() # Recebe a resposta do servidor
-
-                partes = response.split(",", 1)
-                codigo = int(partes[0].strip())
-                mensagem = partes[1].strip() if len(partes) > 1 else None
+                response = ast.literal_eval(self.cliente.recv(self.__tamanhoBuffer).decode()) # Recebe a resposta do servidor
+                # print(response)
+                if type(response) is tuple:
+                    codigo, mensagem = response
+                else:
+                    codigo, mensagem = response, None
+                
+                # print(codigo, mensagem)
+                # partes = response.split(",", 1)
+                # codigo = int(partes[0].strip())
+                # mensagem = partes[1].strip() if len(partes) > 1 else None
                 
                 resultado_mensagem = self.obter_mensagem(codigo, mensagem)
                 if resultado_mensagem:
