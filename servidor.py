@@ -93,7 +93,6 @@ class ServidorBanco:
                 resposta = processar_requisicao(requisicao, self.__gerenciador) # Procesa a requisição recebida e obtém a resposta
                 # Envia a resposta de volta para o cliente
                 if resposta is not tuple:
-                    print(resposta)
                     cliente.send(f"{resposta}".encode())
                 else:
                     cliente.send(f"{resposta[0]},{resposta[1]}".encode())
