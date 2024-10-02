@@ -12,7 +12,10 @@ if __name__ == "__main__":
     Exemplo de uso:
         Executar o script para iniciar a interação do cliente.
     '''
-    cliente = BankClient()
+    
+    host = input("Digite o endereço IP do servidor. Caso esteja rodando localmente, deixe em branco: ")
+    
+    cliente = BankClient(host=host)
 
     # Verificia se a conexão com o servidor foi estabelecida
     if cliente.cliente: # O atributo cliente da instância BankClient indica o status da conexão.
@@ -50,7 +53,7 @@ if __name__ == "__main__":
                 elif escolha == "3":
                     numero_conta = input("Número da conta: ")
                     valor = input("Valor do depósito: ")
-                    cliente.enviar_requisicao(f"DEPOSIT {numero_conta} {valor}") 
+                    cliente.enviar_requisicao(f"DEPOSIT {numero_conta} {valor}")
                     cliente.pausa_interacao()
 
                 elif escolha == "4":
@@ -73,7 +76,7 @@ if __name__ == "__main__":
 
                 elif escolha == "7":
                     cliente.fechar_conexao()
-                    break
+                    break  # encerra o loop e sai do menu
 
                 else:
                     print("Opção inválida.")

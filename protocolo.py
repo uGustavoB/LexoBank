@@ -1,4 +1,6 @@
-def processar_requisicao(requisicao, gerenciador_contas):
+from servidor import GerenciadorContas
+
+def processar_requisicao(requisicao: str, gerenciador_contas: GerenciadorContas) -> tuple:
     '''
     Processa uma requisição recebida e retorna a resposta correspondente.
 
@@ -11,12 +13,12 @@ def processar_requisicao(requisicao, gerenciador_contas):
             O código indica o status da operação e a mensagem fornece detalhes adicionais
 
     Exemplos de uso:
-        resposta = processar_requisicao("CREATE 12345 1000.0")
-        print(resposta) (201, None)
+        resposta = processar_requisicao("CREATE 12345 1000.0", self.__gerenciador)
+        print(resposta)
     '''
     partes = requisicao.split()  # Divide a requisição em partes utilizando o espaço como delimitador
     
-    def check_erro(quantidade: int):
+    def check_erro(quantidade: int) -> bool:
         '''
         Verifica se a quantidade de argumentos passados é a esperada.
 
@@ -24,12 +26,12 @@ def processar_requisicao(requisicao, gerenciador_contas):
             quantidade (int): Número esperado de argumentos na requisição.
         
         Retorna:
-            bool: Retorna True se a quantidade estiver errada, caso contrário False.
+            bool: Retorna True se a quantidade estiver errada, caso contrário False
         '''
         if len(partes) != quantidade:
             return True
     
-    def mensagem_erro_quantidade(esperado: int):
+    def mensagem_erro_quantidade(esperado: int) -> str:
         '''
         Gera uma mensagem de erro informando a quantidade de argumentos incorreta.
 

@@ -1,4 +1,5 @@
 import socket
+import ast
 
 class BankClient:
     '''
@@ -11,7 +12,7 @@ class BankClient:
         cliente (socket.socket): Objeto socket que representa a conexão com o servidor. É inicializado
         no método `__init__` e utilizado nos métodos `enviar_requisicao` e `fechar_conexao`.
     '''
-    def __init__(self, host="localhost", port=9999, tamanhoBuffer=1024):
+    def __init__(self, host: str = "localhost", port: int = 9999, tamanhoBuffer: int = 1024):
         '''
         Inicializa a conexão com o servidor de banco.
 
@@ -22,14 +23,15 @@ class BankClient:
         Parâmetros:
             host (str): Endereço do servidor. O padrão é "localhost".
             port (int): Porta na qual o servidor está escutando. O padrão é 9999.
+            tamanhoBuffer (int): Tamanho do buffer para recepção de mensagens. O padrão é 1024.
 
         Exceções:
             socket.error: Captura erros de conexão e informa que a conexão falhou.
         '''
-
         self.__tamanhoBuffer = tamanhoBuffer
         try:
             self.cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Cria um socket TCP/IP
+            self.cliente.settimeout(5) # Define um tempo limite de 5 segundos para a conexão
             self.cliente.connect((host, port)) # Conecta ao servidor
             print("Conectado ao servidor com sucesso.")
         except socket.error:
@@ -37,7 +39,7 @@ class BankClient:
             self.cliente = None # Define como None para indicar que a conexão falhou
                                 # Fazendo isso a gente consegue fazer a verificação do estado da conexão em outros métodos
 
-    def enviar_requisicao(self, requisicao):
+    def enviar_requisicao(self, requisicao: str):
         '''
         Envia uma requisição para o servidor e lida com a resposta.
 
@@ -57,11 +59,17 @@ class BankClient:
         if self.cliente:
             try:
                 self.cliente.send(requisicao.encode()) # Envia a requisição codificada
-                response = self.cliente.recv(self.__tamanhoBuffer).decode() # Recebe a resposta do servidor
-
-                partes = response.split(",", 1)
-                codigo = int(partes[0].strip())
-                mensagem = partes[1].strip() if len(partes) > 1 else None
+                response = ast.literal_eval(self.cliente.recv(self.__tamanhoBuffer).decode()) # Recebe a resposta do servidor
+                # print(response)
+                if type(response) is tuple:
+                    codigo, mensagem = response
+                else:
+                    codigo, mensagem = response, None
+                
+                # print(codigo, mensagem)
+                # partes = response.split(",", 1)
+                # codigo = int(partes[0].strip())
+                # mensagem = partes[1].strip() if len(partes) > 1 else None
                 
                 resultado_mensagem = self.obter_mensagem(codigo, mensagem)
                 if resultado_mensagem:
@@ -73,7 +81,7 @@ class BankClient:
         else:
             print("Não há conexão com o servidor. Verifique se o servidor está ativo.")
 
-    def obter_mensagem(self, codigo: int, mensagem: str = None):
+    def obter_mensagem(self, codigo: int, mensagem: str = None) -> str:
         '''
         Retorna uma mensagem correspondente ao código de status recebido do servidor.
 
@@ -89,7 +97,7 @@ class BankClient:
             str: Mensagem amigável ao usuário baseada no código de status, ou `None` se o código for desconhecido.
 
         Exemplo:
-            client.obter_mensagem(200)  # Retorna "Operação realizada com sucesso"
+            client.obter_mensagem(200)  # Retorna "Operação realizada com sucesso"   
         '''
         mensagens = {
             200: "Operação realizada com sucesso",

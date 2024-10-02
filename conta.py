@@ -21,31 +21,31 @@ class Conta:
         self.saldo = saldo
         self.historico = Pilha()  # Histórico utilizando pilha encadeada
 
-    def depositar(self, valor: float):
+    def depositar(self, valor: float) -> int:
         '''
         Método que deposita um valor na conta e adiciona a transação ao histórico.
 
         Parâmetros:
-            valor (float): O valor a ser depositado
+            valor (float): O valor a ser depositado.
 
         Returns: 
-            tuple: Um código indicando o resultado da operação e uma mensagem opcional.
+            int: Um código indicando o resultado da operação.
             Códigos:
             - 200: Operação realizada com sucesso.
-            - 306: O valor do depósito deve ser positivo
+            - 306: O valor do depósito deve ser positivo.
 
         Exemplos de uso:
             conta = Conta("12345", 1000.0)
             resultado = conta.depositar(500.0)
-            print(resultado) # (200, None)
+            print(resultado)  # 200
         '''
         if valor <= 0:
-            return 306, None
+            return 306
         self.saldo += valor
         self.historico.empilha(f"Depósito: {valor}")
-        return 200, None
+        return 200
 
-    def sacar(self, valor: float):
+    def sacar(self, valor: float) -> int:
         '''
         Saca um valor da conta e adiciona a transação ao histórico.
 
@@ -53,24 +53,24 @@ class Conta:
             valor (float): O valor a ser sacado.
         
         Returns:
-            tuple: Um código indicando o resultado da operação e uma mensagem opcional.
+            int: Um código indicando o resultado da operação.
                 Códigos:
                 - 200: Operação realizada com sucesso.
-                - 304: Saldo insuficiente
-                - 307: O valor do saque deve ser maior que zero
+                - 304: Saldo insuficiente.
+                - 307: O valor do saque deve ser maior que zero.
 
         Exemplos de uso:
             conta = Conta("12345", 1000.0)
             resultado = conta.sacar(300.0)
-            print(resultado)  # (200, None)
+            print(resultado)  # 200
         '''
         if valor > self.saldo:
-            return 304, None
+            return 304
         if valor <= 0:
-            return 307, None
+            return 307
         self.saldo -= valor
         self.historico.empilha(f"Saque: {valor}")
-        return 200, None 
+        return 200
     
     def exibeHistorico(self) -> str:
         '''
@@ -83,11 +83,11 @@ class Conta:
             conta = Conta("12345")
             conta.depositar(500.0)
             historico = conta.exibeHistorico()
-            print(historico)  # Histórico -> [Depósito: 500.0, Déposito inicial de: 0.0.]
+            print(historico) 
         '''
-        return self.historico
+        return self.historico.__str__()
 
-    def __str__(self):
+    def __str__(self) -> str:
         '''
         Retorna uma representação em string da conta.
 
@@ -96,7 +96,6 @@ class Conta:
 
         Exemplos de uso:
             conta = Conta("12345", 1000.0)
-            print(conta)  # "Conta 12345: Saldo 1000.0"
-
+            print(conta)
         '''
         return f'Conta {self.numero}: Saldo {self.saldo}'
