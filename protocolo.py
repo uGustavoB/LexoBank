@@ -1,4 +1,4 @@
-from servidor import GerenciadorContas
+from gerenciadorContas import GerenciadorContas
 
 def processar_requisicao(requisicao: str, gerenciador_contas: GerenciadorContas) -> tuple:
     '''

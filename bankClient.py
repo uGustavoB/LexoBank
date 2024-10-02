@@ -61,7 +61,7 @@ class BankClient:
             try:
                 self.cliente.send(requisicao.encode()) # Envia a requisição codificada
                 response = ast.literal_eval(self.cliente.recv(self.__tamanhoBuffer).decode()) # Recebe a resposta do servidor
-                # print(response)
+                
                 if type(response) is tuple:
                     codigo, mensagem = response
                 else:
@@ -116,11 +116,12 @@ class BankClient:
             404: "Erro desconhecido."
         }
         
+        # print(codigo, mensagem)
         # Adicionado verificação para retornar a mensagem de erro personalizada
         if codigo == 404:
             return mensagem if mensagem else None
         if codigo == 200:
-            return mensagem if mensagem else mensagens.get(codigo, None)
+            return mensagem if mensagem is not None and mensagem != "" else mensagens.get(codigo, None)
         return mensagens.get(codigo, mensagem if mensagem else None)
     
     def fechar_conexao(self):
