@@ -17,6 +17,7 @@ class ServidorBanco:
         __tamanhoBuffer (int): Tamanho do buffer para a leitura de dados do cliente.
         endereco (tuple): Endereço IP e porta do cliente conectado.
     """
+    
     def __init__(self, host: str = "0.0.0.0", port: int = 9999, tamanhoBuffer: int = 1024):
         '''
         Inicializa o servidor com o endereço IP e a porta.

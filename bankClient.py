@@ -12,6 +12,7 @@ class BankClient:
         cliente (socket.socket): Objeto socket que representa a conexão com o servidor. É inicializado
         no método `__init__` e utilizado nos métodos `enviar_requisicao` e `fechar_conexao`.
     '''
+
     def __init__(self, host: str = "localhost", port: int = 9999, tamanhoBuffer: int = 1024):
         '''
         Inicializa a conexão com o servidor de banco.
